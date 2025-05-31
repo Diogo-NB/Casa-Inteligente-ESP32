@@ -8,10 +8,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_AHTX0.h>
 
-#define SSID "SSID"
-#define PASSWORD "PASSWORD"
-#define HOST "192.XXX.XXX.XXX"
-#define PORT 3000
+#define SSID "Jack"
+#define PASSWORD "10705470"
+#define HOST "192.168.0.15"
+#define PORT 3333
 
 #define PIR_PIN 23
 
@@ -34,15 +34,15 @@ Adafruit_AHTX0 aht20;
 sensors_event_t aht20TempEvt, aht20HumEvt;
 
 bool pirState = false;
-float temperature = 0;
-float humidity = 0;
+float temperature = 1;
+float humidity = 0.5;
 
 void setup() {
   Serial.begin(115200);
 
   if (!aht20.begin()) {
     Serial.println("Nao foi possivel encontrar um sensor AHT20, verifique as conexoes!");
-    while (1);
+    while (1) delay(10);
   }
 
   pinMode(PIR_PIN, INPUT);
