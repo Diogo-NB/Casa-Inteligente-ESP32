@@ -1,12 +1,12 @@
-import { IsBoolean, IsPositive } from 'class-validator';
+import { IsBoolean, IsNumber, IsPositive } from 'class-validator';
 
 export class SensorDto {
-  @IsBoolean()
-  pir: boolean;
+  @IsNumber()
+  distance: number;
 
-  @IsPositive()
+  @IsNumber()
   temperature: number;
 
-  @IsPositive()
+  @IsNumber()
   humidity: number;
 }

@@ -13,10 +13,11 @@
 #define HOST "192.168.0.15"
 #define PORT 3333
 
-#define PIR_PIN 23
+#define US_ECHO_PIN 4
+#define US_TRIG_PIN 5
 
-#define LAMP1_PIN 4
-#define LAMP2_PIN 5
+#define LAMP1_PIN 17
+#define LAMP2_PIN 23
 #define LAMP3_PIN 18
 #define LAMP4_PIN 19
 
@@ -33,19 +34,22 @@ Adafruit_AHTX0 aht20;
 
 sensors_event_t aht20TempEvt, aht20HumEvt;
 
-bool pirState = false;
-float temperature = 1;
-float humidity = 0.5;
+float distance = 0;
+float temperature = 0;
+float humidity = 0;
 
 void setup() {
   Serial.begin(115200);
 
   if (!aht20.begin()) {
-    Serial.println("Nao foi possivel encontrar um sensor AHT20, verifique as conexoes!");
-    while (1) delay(10);
+    while (1) {
+      Serial.println("Nao foi possivel encontrar um sensor AHT20, verifique as conexoes!");
+      delay(1000);
+    }
   }
 
-  pinMode(PIR_PIN, INPUT);
+  pinMode(US_ECHO_PIN, INPUT);
+  pinMode(US_TRIG_PIN, OUTPUT);
 
   pinMode(LAMP1_PIN, OUTPUT);
   pinMode(LAMP2_PIN, OUTPUT);
@@ -67,21 +71,21 @@ bool digitalReadBool(int pin) {
 }
 
 void readSensors() {
-  pirState = digitalReadBool(PIR_PIN);
   aht20.getEvent(&aht20HumEvt, &aht20TempEvt);
 
   if (isnan(aht20TempEvt.temperature) || isnan(aht20HumEvt.relative_humidity)) {
-    Serial.println("Falha na leitura do aht20!");
+    Serial.println("Falha na leitura do AHT20!");
     return;
   }
 
+  distance = pulseIn(US_ECHO_PIN, HIGH) * 0.034 / 2;
   temperature = aht20TempEvt.temperature;
   humidity = aht20HumEvt.relative_humidity;
 }
 
 void sendSensorData() {
   JsonDocument doc;
-  doc["pir"] = pirState;
+  doc["distance"] = distance;
   doc["temperature"] = temperature;
   doc["humidity"] = humidity;
 
@@ -175,5 +179,5 @@ void loop() {
     Serial.println("WiFi not connected");
   }
 
-  delay(2500);
+  delay(3000);
 }

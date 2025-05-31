@@ -6,39 +6,37 @@ import { ActuatorsStateDto } from './dto/actuators-state.dto';
 export class AppController {
   constructor() {}
 
+  static count = 0; // TODO - REMOVER
   static lastSensorData: SensorDto | null = null; // TODO - ARMAZENAR NO BANCO E NÃO EM MEMÓRIA
 
   @Post('sensors')
-  postSensors(@Body() body: SensorDto): void {
-    AppController.lastSensorData = body; // TODO - INSERT NO BANCO
+  postSensors(@Body() dto: SensorDto): void {
+    console.log('Got sensor data:', dto);
+    AppController.lastSensorData = dto; // TODO - INSERT NO BANCO
   }
 
   @Post('actuators/state')
   getActuatorsState(
     @Body() currentState: ActuatorsStateDto,
   ): Partial<ActuatorsStateDto> {
+    console.log('Got current state:', AppController.count++, currentState);
     if (!AppController.lastSensorData) {
       return {
         lamp1: false,
         lamp2: false,
         lamp3: false,
         lamp4: false,
-        fan1: true,
+        fan1: false,
         fan2: false,
         general1: false,
         general2: false,
       };
     }
 
-    const { pir, temperature, humidity } = AppController.lastSensorData;
+    const { distance, temperature, humidity } = AppController.lastSensorData;
 
     return {
       lamp1: !currentState.lamp1,
-      lamp3: !currentState.lamp3,
-      fan1: pir ? currentState.fan2 : false,
-      fan2: pir ? currentState.fan1 : false,
-      general1: pir,
-      general2: pir,
     }; // TODO - LÓGICA DE ATUALIZAR ESP
   }
 }
