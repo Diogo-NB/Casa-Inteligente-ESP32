@@ -41,7 +41,7 @@ void setup() {
   Serial.begin(115200);
 
   if (!aht20.begin()) {
-    Serial.println("Não foi possível encontrar um sensor AHT20, verifique as conexões!");
+    Serial.println("Nao foi possivel encontrar um sensor AHT20, verifique as conexoes!");
     while (1);
   }
 
@@ -104,6 +104,12 @@ void sendSensorData() {
   http.end();
 }
 
+void writeIfKeyExists(JsonDocument& doc, const char* key, uint8_t pin) {
+  if (doc.containsKey(key) && !doc[key].isNull()) {
+    digitalWrite(pin, doc[key] ? HIGH : LOW);
+  }
+}
+
 void syncActuatorStates() {
   JsonDocument doc;
 
@@ -141,16 +147,16 @@ void syncActuatorStates() {
       Serial.print("[HTTP] POST /actuators/state response: ");
       serializeJsonPretty(resDoc, Serial);
 
-      digitalWrite(LAMP1_PIN, resDoc["lamp1"] ? HIGH : LOW);
-      digitalWrite(LAMP2_PIN, resDoc["lamp2"] ? HIGH : LOW);
-      digitalWrite(LAMP3_PIN, resDoc["lamp3"] ? HIGH : LOW);
-      digitalWrite(LAMP4_PIN, resDoc["lamp4"] ? HIGH : LOW);
+      writeIfKeyExists(resDoc, "lamp1", LAMP1_PIN);
+      writeIfKeyExists(resDoc, "lamp2", LAMP2_PIN);
+      writeIfKeyExists(resDoc, "lamp3", LAMP3_PIN);
+      writeIfKeyExists(resDoc, "lamp4", LAMP4_PIN);
 
-      digitalWrite(FAN1_PIN, resDoc["fan1"] ? HIGH : LOW);
-      digitalWrite(FAN2_PIN, resDoc["fan2"] ? HIGH : LOW);
+      writeIfKeyExists(resDoc, "fan1", FAN1_PIN);
+      writeIfKeyExists(resDoc, "fan2", FAN2_PIN);
 
-      digitalWrite(GENERAL1_PIN, resDoc["general1"] ? HIGH : LOW);
-      digitalWrite(GENERAL2_PIN, resDoc["general2"] ? HIGH : LOW);
+      writeIfKeyExists(resDoc, "general1", GENERAL1_PIN);
+      writeIfKeyExists(resDoc, "general2", GENERAL2_PIN);
     }
   } else {
     Serial.printf("[HTTP] POST /actuators/state error: %s\n", http.errorToString(httpCode).c_str());
