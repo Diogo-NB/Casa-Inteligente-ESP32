@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsPositive } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class SensorDto {
   @IsNumber()
